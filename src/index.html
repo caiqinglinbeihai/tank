@@ -13,10 +13,13 @@
       width: 512px;
       height: 448px;
       background: #1a1d21;
-      
+      margin: 0 auto;
+      overflow: hidden;
     }
     canvas {
       position: absolute;
+      left: 0;
+      top: 0;
       background: transparent;
     }
     img {
@@ -30,173 +33,19 @@
     <img src="./images/tankAll.gif" id="img_tankAll" alt="img_tankAll">
     <canvas id="menu" width="512" height="448"></canvas>
     <canvas id="tank" width="512" height="448"></canvas>
+    <canvas id="stage" width="512" height="448"></canvas>
   </div>
   
+  <script src="js/constant.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/tank.js"></script>
+  <script src="js/stage.js"></script>
+  <script src="js/game.js"></script>
   <script>
     window.onload = function () {
-      var log = console.log.bind(console);
-      var IMG_MENU = document.querySelector('#img_menu');
-      var IMG_TANKALL = document.querySelector('#img_tankAll');
-      var WIDTH = 512;
-      var HEIGHT = 448;
-      var SIZE = 32;
-      var KEYBOARD = {
-        W: 87,
-        S: 83,
-        A: 65,
-        D: 68,
-        J: 74,
-        UP: 38,
-        DOWN: 40,
-        LEFT: 37,
-        RIGHT: 39,
-        ENTER: 13,
-        SPACE: 32,
-      }
-      var TANK_TYPE = {
-        player1: 0,
-        player2: 1,
-        enemy1: 0,
-        enemy2: 1,
-        enemy3: 2,
-        enemy4: 3,
-      }
-      var DIRECTION = {
-        UP: 0,
-        DOWN: 1,
-        LEFT: 2,
-        RIGHT: 3,
-      }
-      var TANK_ATTRS = {
-        selector: {
-          imgPos: [128, 96],
-          size: 28,
-          x: 140,
-          ys: [250, 280],
-        },
-        player: {
-          imgPos: [
-            [[0,0], [32, 0], [64, 0], [96, 0]],
-            [[128, 0], [160, 0], [192, 0], [224, 0]],
-          ],
-          pos: [
-            [196, 416], [304, 416]
-          ],
-          size: 32,
-          direction: DIRECTION.UP,
-        },
-        enemy: {
-          imgPos: [
-            [[0,32], [32, 32], [64, 32], [96, 32]], 
-            [[0,64], [32, 64], [64, 64], [96, 64]], 
-            [[128, 32], [160, 32], [192, 32], [224, 32]], 
-            [[128, 64], [160, 64], [192, 64], [224, 64]],
-          ],
-          pos: [
-            [0,0], [240, 0], [480, 0]
-          ],
-          size: 32,
-          direction: DIRECTION.DOWN,
-        }
-      }
-      
-      function Tank(role, type) {
-        log(role)
-        this.imgPos = TANK_ATTRS[role].imgPos[type];
-        this.pos = TANK_ATTRS[role].pos[type % TANK_ATTRS[role].pos.length];
-        this.size = TANK_ATTRS[role].size;
-        this.direction = TANK_ATTRS[role].direction;
-      }
-      
-      function Player(type) {
-        Tank.call(this, 'player', type);
-      }
-      Player.prototype = new Tank();
-      
-      function Menu(el) {
-        this.el = document.querySelector(el);
-        this.ctx = this.el.getContext('2d');
-        
-        var selector = TANK_ATTRS['selector']
-        // imgPos, size, x, ys
-        for( var i in selector ) {
-          this[i] = selector[i];
-        }
-        // player size 
-        this.num = 1;
-        // canvas position
-        this.left = 0;
-        this.top = HEIGHT;
-        this.animate();
-      }
-      
-      Menu.prototype.render = function () {
-        this.ctx.clearRect(0, 0, WIDTH, HEIGHT);
-        this.ctx.drawImage(IMG_MENU, 0, 0, WIDTH, HEIGHT);
-        this.ctx.drawImage(IMG_TANKALL, this.imgPos[0], this.imgPos[1], this.size, this.size, this.x, this.ys[this.num - 1], this.size, this.size);
-        this.ctx.save();
-      }
-      
-      Menu.prototype.animate = function () {
-        this.top = HEIGHT;
-        this.el.style.top = this.top + 'px';
-        this.render();
-        var self = this;
-        var interval = setInterval(function () {
-          if (self.top <= 0) {
-            clearInterval(interval)
-          } else {
-            self.top -= 4;
-            self.el.style.top = self.top + 'px';
-          }
-        }, 20);
-      }
-      
-      Menu.prototype.selectNumber = function (keyCode) {
-        if (keyCode === KEYBOARD.UP || keyCode === KEYBOARD.DOWN) {
-          this.num = this.num === 1 ? 2 : 1;
-          this.render();
-        }
-        
-        if (e.keyCode === KEYBOARD.ENTER) {
-          this.next();
-        }
-      }
-      
-      Menu.prototype.next = function () {
-        window.game = new Game(this.num, 1);
-      }
-     
-      
-      function Game(playerNumber, level) {
-        this.keys = [];
-        
-        this.keyboardListen();
-      }
-      
-      Game.prototype.keyboardListen = function () {
-        var self = this;
-        window.onkeydown = function (e) {
-          if (self.keys.indexOf(e.keyCode) === -1) {
-            self.keys.push(e.keyCode);
-          }
-        }
-        window.onkeyup = function (e) {
-          var i = self.keys.indexOf(e.keyCode);
-          if (i !== -1) {
-            self.keys.splice(i, 1);
-          }
-        }
-      }
-      Game.prototype.selectPlayer = function () {
-        
-      }
-      
-      var ctx = document.querySelector('#tank').getContext('2d');
-      var p = new Player(0);
-      log(p)
-      var imgPos = p.imgPos[p.direction];
-      ctx.drawImage(IMG_TANKALL, imgPos[0], imgPos[1], p.size, p.size, p.pos[0], p.pos[1], p.size, p.size);
+      var g = new Game();
+
+      g.run();
     }
   </script>
 </body>
